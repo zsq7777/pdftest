@@ -17,9 +17,11 @@ interface PdfController {
     val pageCount: Int
     val currentPage: Int
     val isReady: Boolean
-     fun jumpToPage(page: Int)
-     fun previousPage()
-     fun nextPage()
+    fun jumpToPage(page: Int)
+    fun previousPage()
+    fun nextPage()
+    fun jumpToBottom(smooth: Boolean = true)
+
 }
 
 internal class PdfControllerImpl(
@@ -64,12 +66,32 @@ internal class PdfControllerImpl(
         }
     }
 
-    override  fun previousPage() = jumpToPage(currentPage - 1)
-    override  fun nextPage() = jumpToPage(currentPage + 1)
+    override fun previousPage() = jumpToPage(currentPage - 1)
+    override fun nextPage() = jumpToPage(currentPage + 1)
+    override fun jumpToBottom(smooth: Boolean) {
+        if (pageCount == 0) return
+
+        val lastPage = pageCount - 1
+        state.currentPage = lastPage
+
+        coroutineScope.launch {
+            try {
+                if (smooth) {
+                    state.listState.animateScrollToItem(lastPage)
+                } else {
+                    state.listState.scrollToItem(lastPage)
+                }
+            } catch (e: Exception) {
+                Log.e("PdfViewer", "Jump to bottom failed: ${e.message}")
+                // 失败后尝试基础滚动
+                state.listState.scrollToItem(lastPage)
+            }
+        }
+    }
 
     internal fun renderPage(page: Int): Bitmap {
-        val bitmap = pageCache[page] ?:renderer.renderPage(page)
-        pageCache.put(page,bitmap)
+        val bitmap = pageCache[page] ?: renderer.renderPage(page)
+        pageCache.put(page, bitmap)
         return bitmap
     }
 
