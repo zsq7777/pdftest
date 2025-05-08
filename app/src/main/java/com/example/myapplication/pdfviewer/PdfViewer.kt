@@ -20,7 +20,6 @@ import com.example.myapplication.pdfviewer.zoom.EnhancedPageItem
  * @param data 支持文件路径、File对象或Uri
  * @param modifier 样式修饰符
  * @param state 组件状态（可选）
- * @param controller 自定义控制器（可选）
  */
 @Composable
 fun PdfViewer(
