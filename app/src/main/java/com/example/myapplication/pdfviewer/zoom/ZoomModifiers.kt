@@ -1,6 +1,5 @@
 package com.example.myapplication.pdfviewer.zoom
 
-// PdfGestureModifier.kt
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -8,6 +7,7 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +24,8 @@ fun Modifier.pdfGesture(
     scrollState: LazyListState,
     coroutineScope: CoroutineScope
 ): Modifier = composed {
-    var isScrollEnabled by remember { mutableStateOf(true) }
+    // 关联到缩放状态，自动控制
+    val isScrollEnabled by remember { derivedStateOf { zoomState.scale == zoomState.minScale } }
 
     this
         // 缩放手势处理
@@ -35,7 +36,6 @@ fun Modifier.pdfGesture(
                 zoomState.apply {
                     applyScaleDelta(centroid, zoom)
                     adjustOffset(pan)
-                    isScrollEnabled = scale == minScale
                 }
             }
         }
@@ -43,19 +43,18 @@ fun Modifier.pdfGesture(
         .pointerInput(Unit) {
             detectTapGestures(
                 onDoubleTap = { tapPosition ->
-                    zoomState.toggleZoom()
-                    isScrollEnabled = zoomState.scale == zoomState.minScale
+                    zoomState.toggleZoom(tapPosition)
                 }
             )
         }
         // 滚动集成
         .scrollable(
             orientation = Orientation.Vertical,
-            enabled = isScrollEnabled,
+            enabled = isScrollEnabled, // 直接绑定到缩放状态
             state = rememberScrollableState { delta ->
                 if (isScrollEnabled) {
                     coroutineScope.launch {
-                        scrollState.scrollBy(-delta * 2) // 调整滚动灵敏度
+                        scrollState.scrollBy(-delta) // 移除灵敏度系数
                     }
                     delta
                 } else 0f

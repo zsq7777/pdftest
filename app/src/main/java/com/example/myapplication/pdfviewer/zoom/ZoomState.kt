@@ -21,9 +21,19 @@ class ZoomState {
     private val maxScale = 5f
 
     // 双击切换缩放
-    fun toggleZoom() {
+    fun toggleZoom(tapPosition: Offset? = null) {
         scale = if (scale > minScale) minScale else 2.5f
-        if (scale == minScale) offset = Offset.Zero
+        if (scale == minScale) {
+            offset = Offset.Zero
+        } else {
+            // 双击时基于点击位置居中
+            tapPosition?.let { pos ->
+                offset = Offset(
+                    x = pos.x * (1 - scale) / scale,
+                    y = pos.y * (1 - scale) / scale
+                )
+            }
+        }
     }
 
     // 应用缩放增量
@@ -41,12 +51,16 @@ class ZoomState {
         isZooming = scale > minScale
     }
 
-    // 调整偏移量（带边界限制）
+    //  边界处理方法
     fun adjustOffset(delta: Offset) {
         if (!isZooming) return
 
-        val maxX = (contentSize.width * (scale - 1)) / 2
-        val maxY = (contentSize.height * (scale - 1)) / 2
+        // 计算实际可移动范围（考虑缩放后的尺寸）
+        val scaledWidth = contentSize.width * scale
+        val scaledHeight = contentSize.height * scale
+
+        val maxX = (scaledWidth - contentSize.width) / 2
+        val maxY = (scaledHeight - contentSize.height) / 2
 
         offset = Offset(
             x = (offset.x + delta.x).coerceIn(-maxX, maxX),
