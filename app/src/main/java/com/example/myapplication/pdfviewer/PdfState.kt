@@ -9,9 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 
-/**
- * 记忆化组件状态
- */
+
 @Composable
 fun rememberPdfViewerState() = remember {
     PdfViewerState()
