@@ -3,6 +3,8 @@ package com.example.myapplication.pdfviewer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -11,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.pdfviewer.internal.PdfController
 import com.example.myapplication.pdfviewer.internal.PdfControllerImpl
+import com.example.myapplication.pdfviewer.zoom.EnhancedPageItem
 
 /**
  * PDF查看器主组件
@@ -23,21 +26,28 @@ import com.example.myapplication.pdfviewer.internal.PdfControllerImpl
 fun PdfViewer(
     data: Any,
     modifier: Modifier = Modifier,
-    state: PdfViewerState = rememberPdfViewerState(),
-    controller: @Composable (PdfController) -> Unit = { DefaultController(it) }
+    state: PdfViewerState = rememberPdfViewerState()
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val pdfController = remember { PdfControllerImpl(context, data, state, coroutineScope) }
+    val scrollState = rememberLazyListState()
+    val controller = remember { PdfControllerImpl(context, data, state, coroutineScope) }
 
-    DisposableEffect(pdfController) {
-        onDispose { pdfController.close() }
+    DisposableEffect(controller) {
+        onDispose { controller.close() }
     }
-    Column {
-        controller(pdfController)
-        Box(modifier = modifier.fillMaxWidth()) {
-            PageContent(pdfController, state)
+
+    LazyColumn(
+        state = scrollState,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        items(controller.pageCount) { index ->
+            EnhancedPageItem(
+                controller = controller,
+                pageIndex = index,
+                scrollState = scrollState,
+                coroutineScope = coroutineScope
+            )
         }
     }
-
 }
