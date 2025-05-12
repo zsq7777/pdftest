@@ -2,9 +2,11 @@ package com.example.myapplication.pdfviewer.internal
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import java.io.File
 import androidx.core.graphics.createBitmap
 
@@ -66,12 +68,34 @@ class PdfRendererHelper(
         require(pageIndex in 0 until pageCount)
         currentPage?.close()
         return renderer!!.openPage(pageIndex).use { page ->
-            createBitmap(page.width, page.height).apply {
-                page.render(this, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            }
+            // 1. 获取屏幕密度比例因子
+            val displayMetrics = context.resources.displayMetrics
+            val scaleFactor = displayMetrics.density // 或自定义缩放逻辑
+
+            // 2. 计算适配屏幕的 Bitmap 尺寸
+            val scaledWidth = (page.width * scaleFactor).toInt()
+            val scaledHeight = (page.height * scaleFactor).toInt()
+
+            // 3. 创建 Bitmap 并填充白色背景
+            val bitmap = createBitmap(
+                scaledWidth,
+                scaledHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            // 使用 eraseColor 填充白色，防止透明背景
+            bitmap.eraseColor(Color.WHITE)
+
+            // 4. 渲染页面到 Bitmap
+            page.render(
+                bitmap,           // 目标 Bitmap
+                null,             // 裁剪区域（null 表示不裁剪）
+                null,             // 变换矩阵（null 表示无额外缩放）
+                PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY // 或尝试 RENDER_MODE_FOR_PRINT
+            )
+
+            bitmap
         }
     }
-
     fun close() {
         currentPage?.close()
         renderer?.close()
