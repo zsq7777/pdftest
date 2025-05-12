@@ -1,7 +1,9 @@
 package com.example.myapplication.pdfviewer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.myapplication.pdfviewer.internal.PdfController
 import com.example.myapplication.pdfviewer.internal.PdfControllerImpl
 import com.example.myapplication.pdfviewer.zoom.EnhancedPageItem
@@ -38,7 +41,11 @@ fun PdfViewer(
 
     LazyColumn(
         state = scrollState,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        // 设置行间距
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        // 设置首尾间距
+        contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         items(controller.pageCount) { index ->
             EnhancedPageItem(

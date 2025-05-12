@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 fun Greeting() {
     // 简单用法
     val pdfState = rememberPdfViewerState()
-    Box (Modifier.background(Color.Blue)){
+    Box (Modifier){
         PdfViewer(
             data = fromAssets("250219.pdf"),
             state = pdfState,
