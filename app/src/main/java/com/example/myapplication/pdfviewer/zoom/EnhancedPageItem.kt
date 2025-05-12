@@ -44,7 +44,7 @@ fun EnhancedPageItem(
             contentDescription = "Page ${pageIndex + 1}",
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
-                .pdfGesture(zoomState, scrollState, coroutineScope,constraints,bitmapScale)
+                .pdfGesture(zoomState, scrollState, coroutineScope, constraints, bitmapScale)
                 .fillMaxWidth()
         )
     }
@@ -53,21 +53,3 @@ fun EnhancedPageItem(
     Spacer(modifier = Modifier.height(8.dp))
 }
 
-
-/*
-
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//
-//    ) {
-//        Image(
-//            bitmap = bitmap.asImageBitmap(),
-//            contentDescription = "Page ${pageIndex + 1}",
-//            contentScale = ContentScale.FillWidth,
-//            modifier = Modifier
-//                .aspectRatio(bitmap.width.toFloat() / bitmap.height.toFloat())
-//                .pdfGesture(zoomState, scrollState, coroutineScope)
-//                .fillMaxWidth()
-//                .clip(RoundedCornerShape(4.dp)))
-//    }*/

@@ -18,7 +18,7 @@ class ZoomState {
 
     // 最大/最小缩放限制
     val minScale = 1f
-    private val maxScale = 5f
+    val maxScale = 5f
 
 
 }

@@ -89,7 +89,7 @@ internal fun Modifier.pdfGesture(
         .pointerInput(Unit) {
             detectTapGestures(
                 onDoubleTap = { tapPosition ->
-                    val minScale = 1f
+                    val minScale = zoomState.minScale
                     zoomState.apply {
                         val targetScale = if (scale > minScale) minScale else 3f
                         val newScale = targetScale.coerceIn(1f, 5f) // 限制缩放范围
@@ -100,7 +100,7 @@ internal fun Modifier.pdfGesture(
                         } else {
                             // 获取视图尺寸（需确保 constraints 已正确传递）
                             val viewWidth = constraints.maxWidth.toFloat()
-                            val viewHeight = (constraints.maxWidth/bitmapScale)
+                            val viewHeight = (constraints.maxWidth / bitmapScale)
 
                             // 计算理论偏移量
                             val rawOffsetX = (viewWidth / 2 - tapPosition.x) * (newScale - 1)
@@ -123,17 +123,17 @@ internal fun Modifier.pdfGesture(
             detectTransformGestures { centroid, pan, zoom, _ ->
                 zoomState.apply {
                     scale *= zoom
-                    scale = scale.coerceIn(1f, 5f)
+                    scale = scale.coerceIn(zoomState.minScale, zoomState.maxScale)
 
-                    if (scale > 1f) {
+                    if (scale > zoomState.minScale) {
                         offset = Offset(
                             x = (offset.x + pan.x).coerceIn(
                                 minimumValue = -constraints.maxWidth * (scale - 1) / 2,
                                 maximumValue = constraints.maxWidth * (scale - 1) / 2
                             ),
                             y = (offset.y + pan.y).coerceIn(
-                                minimumValue = -(constraints.maxWidth/bitmapScale) * (scale - 1) / 2,
-                                maximumValue = (constraints.maxWidth/bitmapScale) * (scale - 1) / 2
+                                minimumValue = -(constraints.maxWidth / bitmapScale) * (scale - 1) / 2,
+                                maximumValue = (constraints.maxWidth / bitmapScale) * (scale - 1) / 2
                             )
                         )
                     } else {
