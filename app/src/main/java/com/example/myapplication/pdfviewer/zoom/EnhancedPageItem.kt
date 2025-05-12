@@ -30,7 +30,6 @@ fun EnhancedPageItem(
     scrollState: LazyListState,
     coroutineScope: CoroutineScope
 ) {
-    val context = LocalContext.current
     val zoomState = remember { ZoomState() }
 
     // 渲染页面位图

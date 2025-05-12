@@ -1,6 +1,5 @@
 package com.example.myapplication.pdfviewer.internal
 
-// PdfController.kt
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -17,10 +16,9 @@ interface PdfController {
     val pageCount: Int
     val currentPage: Int
     val isReady: Boolean
-    fun jumpToPage(page: Int)
+    fun jumpToPage(page: Int,smooth: Boolean=false)
     fun previousPage()
     fun nextPage()
-    fun jumpToBottom(smooth: Boolean = true)
 
 }
 
@@ -47,20 +45,20 @@ internal class PdfControllerImpl(
     override val isReady: Boolean
         get() = state.isLoaded
 
-    override fun jumpToPage(page: Int) {
+    override fun jumpToPage(page: Int,smooth: Boolean) {
         if (page !in 0 until pageCount) {
-            Log.w("PdfViewer", "Invalid page index: $page")
             return
         }
 
         state.currentPage = page
         coroutineScope.launch {
             try {
-                // 添加平滑滚动效果
-                state.listState.animateScrollToItem(page)
+                if (smooth) {
+                    state.listState.animateScrollToItem(page)
+                } else {
+                    state.listState.scrollToItem(page)
+                }
             } catch (e: Exception) {
-                Log.e("PdfViewer", "Scroll failed: ${e.message}")
-                // 回退到即时滚动
                 state.listState.scrollToItem(page)
             }
         }
@@ -68,26 +66,7 @@ internal class PdfControllerImpl(
 
     override fun previousPage() = jumpToPage(currentPage - 1)
     override fun nextPage() = jumpToPage(currentPage + 1)
-    override fun jumpToBottom(smooth: Boolean) {
-        if (pageCount == 0) return
 
-        val lastPage = pageCount - 1
-        state.currentPage = lastPage
-
-        coroutineScope.launch {
-            try {
-                if (smooth) {
-                    state.listState.animateScrollToItem(lastPage)
-                } else {
-                    state.listState.scrollToItem(lastPage)
-                }
-            } catch (e: Exception) {
-                Log.e("PdfViewer", "Jump to bottom failed: ${e.message}")
-                // 失败后尝试基础滚动
-                state.listState.scrollToItem(lastPage)
-            }
-        }
-    }
 
     internal fun renderPage(page: Int): Bitmap {
         val bitmap = pageCache[page] ?: renderer.renderPage(page)
