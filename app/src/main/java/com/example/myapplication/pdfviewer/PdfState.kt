@@ -18,6 +18,15 @@ fun rememberPdfViewerState() = remember {
 class PdfViewerState {
     internal val listState = LazyListState()
     var currentPage by mutableIntStateOf(0)
+        private set  // 限制外部直接修改
     var totalPages by mutableIntStateOf(0)
     var isLoaded by mutableStateOf(false)
+
+    var onPageChanged: (Int) -> Unit = {}
+        private set
+
+    fun updateCurrentPage(page: Int) {
+        currentPage = page
+        onPageChanged(page)
+    }
 }

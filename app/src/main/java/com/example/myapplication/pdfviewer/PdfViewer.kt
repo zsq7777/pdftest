@@ -13,8 +13,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -31,36 +34,13 @@ import com.example.myapplication.pdfviewer.zoom.EnhancedPageItem
  */
 @Composable
 fun PdfViewer(
-    data: Any,
+    controller: PdfController,
     modifier: Modifier = Modifier,
     state: PdfViewerState = rememberPdfViewerState()
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val controller = remember { PdfControllerImpl(context, data, state, coroutineScope) }
 
 
-    DisposableEffect(controller) {
-        onDispose { controller.close() }
-    }
     Column {
-        Row(modifier = Modifier.padding(top = 40.dp)) {
-            Text("首页：${controller.currentPage}", modifier = Modifier.clickable {
-                controller.jumpToPage(0)
-            }, fontSize = 25.sp)
-            Text("上一页：${controller.currentPage}", modifier = Modifier.clickable {
-                controller.previousPage()
-            }, fontSize = 25.sp)
-            Text("下一页：${controller.currentPage}", modifier = Modifier.clickable {
-                controller.nextPage()
-            }, fontSize = 25.sp)
-
-            Text("最后一页：${controller.currentPage}", modifier = Modifier.clickable {
-                controller.jumpToPage(controller.pageCount - 1)
-            }, fontSize = 25.sp)
-        }
-
-
         LazyColumn(
             state = state.listState,
             modifier = modifier.fillMaxWidth(),
@@ -74,7 +54,6 @@ fun PdfViewer(
                     controller = controller,
                     pageIndex = index,
                     scrollState = state.listState,
-                    coroutineScope = coroutineScope
                 )
             }
         }

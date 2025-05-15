@@ -77,7 +77,6 @@ fun Modifier.pdfGesture(
 internal fun Modifier.pdfGesture(
     zoomState: ZoomState,
     scrollState: LazyListState,
-    coroutineScope: CoroutineScope,
     constraints: Constraints,
     bitmapScale: Float
 ): Modifier = composed {
@@ -149,9 +148,7 @@ internal fun Modifier.pdfGesture(
             enabled = isScrollEnabled, // 直接绑定到缩放状态
             state = rememberScrollableState { delta ->
                 if (isScrollEnabled) {
-                    coroutineScope.launch {
-                        scrollState.scrollBy(-delta) // 移除灵敏度系数
-                    }
+                    scrollState.dispatchRawDelta(-delta)
                     delta
                 } else 0f
             }
