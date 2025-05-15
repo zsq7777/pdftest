@@ -36,7 +36,7 @@ import com.example.myapplication.pdfviewer.zoom.EnhancedPageItem
 fun PdfViewer(
     controller: PdfController,
     modifier: Modifier = Modifier,
-    state: PdfViewerState = rememberPdfViewerState()
+    state: PdfViewerState
 ) {
 
 

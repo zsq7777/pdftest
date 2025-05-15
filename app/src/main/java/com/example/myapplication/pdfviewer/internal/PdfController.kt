@@ -38,12 +38,10 @@ internal class PdfControllerImpl(
 
 
 
+
     init {
         state.totalPages = renderer.pageCount
         state.isLoaded = true
-    }
-
-    init {
         // 启动协程监听滚动位置
         coroutineScope.launch {
             snapshotFlow { state.listState.layoutInfo.visibleItemsInfo }
@@ -61,7 +59,6 @@ internal class PdfControllerImpl(
     }
     override var dataVersion by mutableStateOf(0)
         private set
-
     override val pageCount: Int
         get() = state.totalPages
 

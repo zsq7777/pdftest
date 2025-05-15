@@ -56,7 +56,7 @@ fun Greeting() {
     val state: PdfViewerState = rememberPdfViewerState()
     // 使用rememberUpdatedState处理数据更新
     val currentData by rememberUpdatedState(fromAssets("250219.pdf"))
-    val controller = remember{
+    val controller = remember {
         PdfControllerImpl(context, currentData, state, coroutineScope)
     }
 
@@ -73,11 +73,22 @@ fun Greeting() {
                 controller.reload(fromAssets("Kotlin.pdf"))
             })
         }
+        Row {
+            Text("当前页码${controller.currentPage}")
+            Text("跳首页", Modifier.clickable {
+                controller.jumpToPage(0)
+            })
+            Text("跳尾页", Modifier.clickable {
+                controller.jumpToPage(controller.pageCount - 1)
+            })
+        }
 
         PdfViewer(
             controller,
-            modifier = Modifier.fillMaxSize()
-        )
+            modifier = Modifier.fillMaxSize(),
+            state,
+
+            )
 
     }
 
