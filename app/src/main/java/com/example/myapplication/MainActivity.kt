@@ -7,10 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -26,6 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.coustom.SlantedProgressBar
+import com.example.myapplication.coustom.StepProgressBar
+import com.example.myapplication.coustom.StepProgressBarWithLabels
+import com.example.myapplication.coustom.StepperProgress
 import com.example.myapplication.pdfviewer.PdfViewer
 import com.example.myapplication.pdfviewer.PdfViewerState
 import com.example.myapplication.pdfviewer.internal.PdfControllerImpl
@@ -40,13 +46,41 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                Greeting()
+                Progress()
             }
         }
     }
 }
 
+@Composable
+fun Progress() {
+    Column(
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Box (Modifier.fillMaxWidth()){
+            // 基础使用
+            SlantedProgressBar(
+                progress = 0.6f,
+                progressColor = Color(0xFFFF5722),
+                barHeight = 50.dp,
+                slantHeight = 16.dp
+            )
+        }
 
+        // 自定义样式
+        SlantedProgressBar(
+            progress = 0.8f,
+            backgroundColor = Color.LightGray.copy(alpha = 0.5f),
+            progressColor = Color(0xFF9C27B0),
+            barHeight = 50.dp,
+            slantHeight = 20.dp,
+            cornerRadius = 4.dp
+        )
+    }
+}
 @Composable
 fun Greeting() {
     // 简单用法
